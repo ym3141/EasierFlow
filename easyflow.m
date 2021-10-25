@@ -419,6 +419,9 @@ set(fh,'Visible','on');
             efdb_save(efdb);
             
         catch resizeError
+            if ~(strcmp(resizeError.identifier,'MATLAB:hg:set_chck:DimensionsOutsideRange'))
+                rethrow(resizeError);
+            end
         end
         
         %redraw the gates in the gate list

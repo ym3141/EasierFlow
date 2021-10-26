@@ -1,0 +1,2 @@
+localConfig = loadLocalConfig();
+easyflow(localConfig);

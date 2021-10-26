@@ -1,4 +1,4 @@
-function db=init_efdb()
+function db=init_efdb(localConfig)
     % Initialize data structures
     % General DB Info
     % it creates a data structure, mArgs with the following fields
@@ -114,7 +114,7 @@ function db=init_efdb()
     db.Display.graph_Yaxis_Radio=4;
     db.Display.smoothprm=100;
 
-    db.DBInfo.Path=pwd;
+    db.DBInfo.Path=localConfig.fcsFileDir;
     db.DBInfo.geom.Graphsize=150;
     db.DBInfo.geom.Gatesize=120;
 

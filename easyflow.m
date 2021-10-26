@@ -1,4 +1,4 @@
-function easyflow(varargin)
+function easyflow(localConfig)
 %EASYFLOW - A GUI for facs data.
 %   EASYFLOW()
 %   EASYFLOW
@@ -29,14 +29,6 @@ curversion = easierFlowInfo('version');
 
 % Initialize 
 fh = init_gui();
-
-% Check arguments
-if nargin>1
-    error('Wrong number of arguments');
-elseif nargin==1
-    % Load session
-    SessionLoadCallback(fh,[],varargin{1});
-end
 
 %  Render GUI visible
 set(fh,'Visible','on');
@@ -352,7 +344,7 @@ set(fh,'Visible','on');
         Handles.RecalcGateLogicalMask=@RecalcGateLogicalMask;
         
         %% Create a database and add to gui
-        efdb=init_efdb();
+        efdb=init_efdb(localConfig);
         efdb.Handles=Handles;
         efdb_save(efdb);
         
@@ -860,7 +852,7 @@ set(fh,'Visible','on');
         else
             MenuFileRelpath.Checked='off';
         end        
-        if isequal(rmfield(efdbIn,'Handles'),rmfield(init_efdb,'Handles'))
+        if isequal(rmfield(efdbIn,'Handles'),rmfield(init_efdb(localConfig),'Handles'))
             set(findobj(hObject,'Label', 'New Session'),'Enable','off')
         else
             set(findobj(hObject,'Label', 'New Session'),'Enable','on')

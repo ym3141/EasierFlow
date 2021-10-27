@@ -1,30 +1,24 @@
 function easyflow(localConfig)
-%EASYFLOW - A GUI for facs data.
-%   EASYFLOW()
-%   EASYFLOW
-%   Opens up a new empty easyflow session.
-%
-%   EASYFLOW('session_filename')
-%   EASYFLOW session_filename
-%   Opens up the session saved in session_filename.
+%% Opens up a new empty easyflow session.
+% Note from Yitong Ma:
+% The easyflow software was originally write by Yaron Anteb, and the
+% orginal version was all written in a single file (this easyflow.m). I
+% have tried to split up this file and put codes into indevidual files in
+% the form of functions. What should remain here are the construction of
+% the main GUI, and their callbacks. That said, there are still lots of
+% other things remains in here at this moment.
 
-%Todos
-% gate edit: change gate name
-% gate edit: move enitre gate (with ctrl)
-% remove the use of fh in functions
-% remove the use of mArgs
-
-%Addpath to the function files
+%% Addpath to the function files
 addpath(genpath('./funcs'));
 
-%% Key UI params (in pixels)
+% Key UI params (in pixels)
 uipos_graphPanelTopDist = 30;
 uipos_graphPanelWidth = 150;
 uipos_topPanelHeight = 100;
 uipos_rightPanelWidth = 200;
 uipos_figpropPanelHeight = 400;
 
-%% written by Yaron Antebi
+% Get the current version number
 curversion = easierFlowInfo('version');
 
 % Initialize 
@@ -142,13 +136,10 @@ set(fh,'Visible','on');
             'Enable','off',...
             'CreateFcn',@GeneralCreateFcn,...
             'Callback',@Color2PUMCallback);
-        cicon(:,:,1)=max(min(filter2(ones(3,3)/6,rand(16,16)),1),0);
-        cicon(:,:,2)=max(min(filter2(ones(3,3)/6,rand(16,16)),1),0);
-        cicon(:,:,3)=max(min(filter2(ones(3,3)/6,rand(16,16)),1),0);
         uicontrol(Handles.TopPanel,...
             'Style','pushbutton',...
-            'Position',[543-132 35 30 30],...
-            'Cdata',cicon,...
+            'Position',[543-132 35 35 35],...
+            'Cdata',imread('./asset/PelatteIcon2.tif'),...
             'Tag','ColorBtn',...
             'CreateFcn',@GeneralCreateFcn,...
             'Enable','off',...

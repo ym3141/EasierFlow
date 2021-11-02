@@ -21,14 +21,16 @@ uipos_figpropPanelHeight = 420;
 % Get the current version number
 curversion = easierFlowInfo('version');
 
-% Initialize 
-fh = init_gui();
+% Initialize
+efdb = init_efdb(localConfig);
+fh = init_gui(efdb);
 
 %  Render GUI visible
 set(fh,'Visible','on');
 
-    function fh=init_gui
+    function fh=init_gui(efdb)
         Handles=[];
+        
         %%  Construct the figure
         scrsz=get(0,'ScreenSize');
         Handles.fh=figure('Position',[scrsz(3)*.15,(scrsz(4)-720)/2, 1080, 720],...
@@ -41,6 +43,7 @@ set(fh,'Visible','on');
             'WindowButtonDownFcn',@ResizeFcn,...
             'WindowButtonMotionFcn',@fhMotionFcn,...
             'CloseRequestFcn',@fhClose);
+                
         %%  Construct the UI regions
         uicontrol(Handles.fh,...
             'Style','listbox',...
@@ -81,7 +84,7 @@ set(fh,'Visible','on');
             'Tag','FigPropPanel',...
             'CreateFcn',@GeneralCreateFcn);
         
-        ui_FigPropPanel(propPanel, [uipos_rightPanelWidth, uipos_figpropPanelHeight]);
+        ui_FigPropPanel(efdb, propPanel, [uipos_rightPanelWidth, uipos_figpropPanelHeight]);
         
         
         %%  Construct the top panel
@@ -341,8 +344,8 @@ set(fh,'Visible','on');
         Handles.CalculateGatedData=@CalculateGatedData;
         Handles.RecalcGateLogicalMask=@RecalcGateLogicalMask;
         
-        %% Create a database and add to gui
-        efdb=init_efdb(localConfig);
+%         %% Create a database and add to gui
+%         efdb=init_efdb(localConfig);
         efdb.Handles=Handles;
         efdb_save(efdb);
         

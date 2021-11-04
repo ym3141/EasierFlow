@@ -295,3 +295,37 @@ set(fh,'Visible','on');
         
     end
 end
+
+function [compmat,colorlist]=EFCalcComp
+    %open unstained file. use it to get the colorlist.
+    [filename,pathname] = uigetfile('*.fcs','Enter Unstained File');
+    if isnumeric(filename)
+        error('No file to load.');
+    else
+        cd(pathname);
+        unstained=fcsload(filename);
+    end
+    parname_idx= ~cellfun(@isempty,regexp(unstained.var_name,'\$P[0-9]+N'));
+    parname=unstained.var_value(parname_idx);
+    colorlist_idx=find(~cellfun(@isempty,regexp(parname,'.+A')));
+    colorlist=parname(colorlist_idx);
+
+    %open single color files
+    usedcolors=[];
+    singledata={};
+    for curcolor = 1:length(colorlist)
+        [filename,pathname] = uigetfile('*.fcs',['Enter ' colorlist{curcolor} '-stained File']);
+        %TBD:check the the colors in this file are the same
+        if ~isnumeric(filename)
+            cd(pathname);
+            tmpdata=fcsload(filename);
+            singledata{end+1}=tmpdata.fcsdata;
+            usedcolors(end+1)=colorlist_idx(curcolor);
+        end
+    end
+    %remove the extra colors
+    singledata=arrayfun(@(x) x{1}(:,usedcolors),singledata,'UniformOutput',0);
+
+    colorlist=parname(usedcolors);
+    compmat=fcscompensate(singledata);
+end

@@ -2,113 +2,113 @@ function EasyFlow_compensation(varargin)
 %  Initialization tasks
 
 %  Initialize input/output parameters
-hMainFig=varargin{1};
-mArgsIn=guidata(hMainFig);
-%if there is already an instance running just make it visible and raise it.
-if isfield(mArgsIn.Handles,'compensation')
-    set(mArgsIn.Handles.compensation,'Visible','on');
-    figure(mArgsIn.Handles.compensation);
-    return;
-end
-
-
-%  Initialize data structures
-%tubeidx=arrayfun(@(x) find(strcmp([mArgsIn.TubeDB.Tubename],x),1,'first'), {mArgsIn.GraphDB(mArgsIn.curGraph).Data});
-graph=mArgsIn.curGraph(1);
-tubename=mArgsIn.GraphDB(graph).Data;
-tubeidx=find(strcmp([mArgsIn.TubeDB.Tubename],tubename),1,'first');
-mtxsize=length(mArgsIn.TubeDB(tubeidx).CompensationPrm);
-mtxnames=mArgsIn.TubeDB(tubeidx).CompensationPrm;
-mtxvalue=mArgsIn.TubeDB(tubeidx).CompensationMtx;
-
-%if some tubes have different compensation - don't show anything.
-for cgraph=mArgsIn.curGraph
-    ctubename=mArgsIn.GraphDB(cgraph).Data;
-    ctubeidx=find(strcmp([mArgsIn.TubeDB.Tubename],ctubename),1,'first');
-    if mtxsize~=length(mArgsIn.TubeDB(ctubeidx).CompensationPrm)...
-            || any(~strcmp(mtxnames,mArgsIn.TubeDB(ctubeidx).CompensationPrm))...
-            || any(any(mtxvalue~=mArgsIn.TubeDB(ctubeidx).CompensationMtx))
-        msgbox('There are tubes with different compensation matrices. Cannot open matrix.','EasyFlow','error','modal');
-        uiwait;
+    hMainFig=varargin{1};
+    mArgsIn=guidata(hMainFig);
+    %if there is already an instance running just make it visible and raise it.
+    if isfield(mArgsIn.Handles,'compensation')
+        set(mArgsIn.Handles.compensation,'Visible','on');
+        figure(mArgsIn.Handles.compensation);
         return;
     end
-end
 
 
-guisizex=0;
-guisizey=0;
-scrsz=get(0,'ScreenSize');
+    %  Initialize data structures
+    %tubeidx=arrayfun(@(x) find(strcmp([mArgsIn.TubeDB.Tubename],x),1,'first'), {mArgsIn.GraphDB(mArgsIn.curGraph).Data});
+    graph=mArgsIn.curGraph(1);
+    tubename=mArgsIn.GraphDB(graph).Data;
+    tubeidx=find(strcmp([mArgsIn.TubeDB.Tubename],tubename),1,'first');
+    mtxsize=length(mArgsIn.TubeDB(tubeidx).CompensationPrm);
+    mtxnames=mArgsIn.TubeDB(tubeidx).CompensationPrm;
+    mtxvalue=mArgsIn.TubeDB(tubeidx).CompensationMtx;
 
-%  Construct the figure
-fh=figure('Position',[scrsz(3) scrsz(4) 1 1],...
-    'MenuBar','none',...
-    'Name','FACS GUI Edit Compensation',...
-    'NumberTitle','off',...
-    'Visible','off',...
-    'Resize','off',...
-    'CloseRequestFcn',{@fhClose,hMainFig});
-mArgsIn.Handles.compensation=fh;
-guidata(hMainFig,mArgsIn);
-Args.fUpdateComp=@UpdateComp;
-guidata(fh,Args);
-
-%  Construct the components
-table=uitable(fh,...
-    'ColumnName',mtxnames,...
-    'RowName',mtxnames,...
-    'Data',mtxvalue,...
-    'ColumnEditable',true,...
-    'CellEditCallback',@ChangeCallback);
-set(fh,'Visible','on');
-fhpos=[(scrsz(3)-guisizex)/2,(scrsz(4)-guisizey)/2,0,0]+get(table,'Extent')+[0 0 0 20];
-set(fh,'Visible','off');
-set(fh,'Position',fhpos);
-set(table,'Position',[1 1 fhpos(3) fhpos(4)-20]);
-uicontrol(fh,...
-    'Style','text',...
-    'String',['Compensation matrix for ' tubename],...
-    'Position',[0 fhpos(4)-20 fhpos(3) 20])
-%Context menus
-%Gates
-TableCM = uicontextmenu('Parent',fh,...
-    'Callback',@MenuTable);
-uimenu(TableCM,...
-    'Label','Copy',...
-    'Callback',@MenuTableCopy);
-uimenu(TableCM,...
-    'Label','Paste',...
-    'Callback',@MenuTablePaste);
-uimenu(TableCM,...
-    'Label','Export',...
-    'Callback',@MenuTableExport);
-uimenu(TableCM,...
-    'Label','Import',...
-    'Callback',@MenuTableImport);
-uimenu(TableCM,...
-    'Label','Use Compensation',...
-    'Callback',@MenuTableUseComp);
-uimenu(TableCM,...
-    'Label','AutoCalc Compensation',...
-    'Callback',@MenuTableAutoComp);
-set(table,'UIContextMenu',TableCM);
-
-%  Initialization tasks
-
-%  Render GUI visible
-set(fh,'Visible','on');
+    %if some tubes have different compensation - don't show anything.
+    for cgraph=mArgsIn.curGraph
+        ctubename=mArgsIn.GraphDB(cgraph).Data;
+        ctubeidx=find(strcmp([mArgsIn.TubeDB.Tubename],ctubename),1,'first');
+        if mtxsize~=length(mArgsIn.TubeDB(ctubeidx).CompensationPrm)...
+                || any(~strcmp(mtxnames,mArgsIn.TubeDB(ctubeidx).CompensationPrm))...
+                || any(any(mtxvalue~=mArgsIn.TubeDB(ctubeidx).CompensationMtx))
+            msgbox('There are tubes with different compensation matrices. Cannot open matrix.','EasyFlow','error','modal');
+            uiwait;
+            return;
+        end
+    end
 
 
-% %  Wait for termination of GUI to give output
-% if nargout>0
-%     uiwait;%uiresume
-%     %  Return the output
-%     mOutputArgs{1}=mArgsIn.GraphDB;
-%     if nargout==size(mOutputArgs,2)
-%         [varargout{1:nargout}] = mOutputArgs{:};
-%     end
-% end
+    guisizex=0;
+    guisizey=0;
+    scrsz=get(0,'ScreenSize');
 
-%  Callbacks.
+    %  Construct the figure
+    fh=figure('Position',[scrsz(3) scrsz(4) 1 1],...
+        'MenuBar','none',...
+        'Name','FACS GUI Edit Compensation',...
+        'NumberTitle','off',...
+        'Visible','off',...
+        'Resize','off',...
+        'CloseRequestFcn',{@fhClose,hMainFig});
+    mArgsIn.Handles.compensation=fh;
+    guidata(hMainFig,mArgsIn);
+    Args.fUpdateComp=@UpdateComp;
+    guidata(fh,Args);
+
+    %  Construct the components
+    table=uitable(fh,...
+        'ColumnName',mtxnames,...
+        'RowName',mtxnames,...
+        'Data',mtxvalue,...
+        'ColumnEditable',true,...
+        'CellEditCallback',@ChangeCallback);
+    set(fh,'Visible','on');
+    fhpos=[(scrsz(3)-guisizex)/2,(scrsz(4)-guisizey)/2,0,0]+get(table,'Extent')+[0 0 0 20];
+    set(fh,'Visible','off');
+    set(fh,'Position',fhpos);
+    set(table,'Position',[1 1 fhpos(3) fhpos(4)-20]);
+    uicontrol(fh,...
+        'Style','text',...
+        'String',['Compensation matrix for ' tubename],...
+        'Position',[0 fhpos(4)-20 fhpos(3) 20])
+    %Context menus
+    %Gates
+    TableCM = uicontextmenu('Parent',fh,...
+        'Callback',@MenuTable);
+    uimenu(TableCM,...
+        'Label','Copy',...
+        'Callback',@MenuTableCopy);
+    uimenu(TableCM,...
+        'Label','Paste',...
+        'Callback',@MenuTablePaste);
+    uimenu(TableCM,...
+        'Label','Export',...
+        'Callback',@MenuTableExport);
+    uimenu(TableCM,...
+        'Label','Import',...
+        'Callback',@MenuTableImport);
+    uimenu(TableCM,...
+        'Label','Use Compensation',...
+        'Callback',@MenuTableUseComp);
+    uimenu(TableCM,...
+        'Label','AutoCalc Compensation',...
+        'Callback',@MenuTableAutoComp);
+    set(table,'UIContextMenu',TableCM);
+
+    %  Initialization tasks
+
+    %  Render GUI visible
+    set(fh,'Visible','on');
+
+
+    % %  Wait for termination of GUI to give output
+    % if nargout>0
+    %     uiwait;%uiresume
+    %     %  Return the output
+    %     mOutputArgs{1}=mArgsIn.GraphDB;
+    %     if nargout==size(mOutputArgs,2)
+    %         [varargout{1:nargout}] = mOutputArgs{:};
+    %     end
+    % end
+
+    %  Callbacks.
     function fhClose(hObject,eventdata,hMainFig)
         mArgsIn=guidata(hMainFig);
         mArgsIn.Handles=rmfield(mArgsIn.Handles,'compensation');

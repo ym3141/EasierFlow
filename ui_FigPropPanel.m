@@ -78,19 +78,19 @@ function ui_FigPropPanel(efdb, propPanel, panelSize)
         'SelectionChangeFcn',@YaxisSelCh,...
         'Position',[145 uipos_axisPanelH-110 35 97]);
     Yaxis(1) = uicontrol(YaxisBG,...
-        'Style','Radio','Tag','lin',...
-        'UserData',[0 Inf 1], 'Enable', 'off',...
+        'Style','Radio','Tag','ylin',...
+        'UserData',[0 Inf 1], 'Enable', 'on',...
         'Position',[5 62 35 20]);
     Yaxis(2) = uicontrol(YaxisBG,...
-        'Style','Radio','Tag','log',...
-        'UserData',[0 Inf 1], 'Enable', 'off',...
+        'Style','Radio','Tag','ylog',...
+        'UserData',[0 Inf 1], 'Enable', 'on',...
         'Position',[5 42 35 20]);
     Yaxis(3) = uicontrol(YaxisBG,...
-        'Style','Radio','Tag','logicle',...
+        'Style','Radio','Tag','ylogicle',...
         'UserData',[-Inf Inf 1], 'Enable', 'off',...
         'Position',[5 22 35 20]);
     Yaxis(4) = uicontrol(YaxisBG,...
-        'Style','Radio','Tag','logicle',...
+        'Style','Radio','Tag','ylogicle',...
         'UserData',[-Inf Inf 10^-1.6], 'Enable', 'off',...
         'Position',[5 2 35 20]);
     set(YaxisBG,'SelectedObject',getcolumn(get(YaxisBG,'Children')',efdb.Display.graph_Yaxis_Radio));
@@ -176,8 +176,8 @@ function ui_FigPropPanel(efdb, propPanel, panelSize)
     
     
     function GraphTypeSelCh(hObject,eventdata)
-        mArgsIn=guidata(hObject);
-        hMainFig=mArgsIn.Handles.fh;
+        mArgsIn = guidata(hObject);
+        hMainFig = mArgsIn.Handles.fh;
         
         mArgsIn.Display.Changed=1;
         mArgsIn.Display.graph_type=get(get(hObject,'SelectedObject'),'String');
@@ -187,21 +187,24 @@ function ui_FigPropPanel(efdb, propPanel, panelSize)
 %         Args=guidata(mArgsIn.Handles.graphprop);
         
         if strcmp(mArgsIn.Display.graph_type,'Histogram')
-            set([Yparam,Yaxis,Yauto], 'Enable','off');
+            set([Yparam,Yaxis([3,4]),Yauto], 'Enable','off');
             set(Yprmhist,'Enable','on');
         else
-            set([Yparam,Yaxis,Yauto], 'Enable','on');
+            set([Yaxis([3,4]),Yauto], 'Enable','on');
             set(Yprmhist,'Enable','off');
+            if get(Yauto, 'Value') == 0
+                set([Yparam, 'Enable', 'on']);
+            end
         end
         if ~isempty(mArgsIn.curGraph)
             mArgsIn.Handles.DrawFcn(mArgsIn);
-            figure(gcbf);
+%             figure(gcbf);
         end
     end
     
     function XaxisSelCh(hObject,eventdata)
-        mArgsIn=guidata(hObject);
-        hMainFig=mArgsIn.Handles.fh;
+        mArgsIn = guidata(hObject);
+        hMainFig = mArgsIn.Handles.fh;
         
         mArgsIn.Display.Changed=1;
         mArgsIn.Display.graph_Xaxis=get(get(hObject,'SelectedObject'),'Tag');
@@ -211,16 +214,16 @@ function ui_FigPropPanel(efdb, propPanel, panelSize)
         mArgsIn.Display.graph_Xaxis_Radio=find(get(hObject,'Children')==get(hObject,'SelectedObject'));
         guidata(hMainFig,mArgsIn);
         mArgsIn.Handles.DrawFcn(mArgsIn);
-        figure(gcbf);
+%         figure(gcbf);
     end
 
     function YaxisSelCh(hObject,eventdata)
-        mArgsIn=guidata(hObject);
-        hMainFig=mArgsIn.Handles.fh;
+        mArgsIn = guidata(hObject);
+        hMainFig = mArgsIn.Handles.fh;
         
         mArgsIn.Display.Changed=1;
         mArgsIn.Display.graph_Yaxis=get(get(hObject,'SelectedObject'),'Tag');
-        if get(findobj(Xauto,'Value'))==1
+        if get(Yauto,'Value')==1
             mArgsIn.Display.graph_Yaxis_param=get(get(hObject,'SelectedObject'),'UserData');
         end
         mArgsIn.Display.graph_Yaxis_Radio=find(get(hObject,'Children')==get(hObject,'SelectedObject'));
@@ -232,6 +235,8 @@ function ui_FigPropPanel(efdb, propPanel, panelSize)
 
     function XAutoCallback(hObject, eventdata)
         mArgsIn = guidata(hObject);
+        hMainFig = mArgsIn.Handles.fh;
+        
         mArgsIn.Display.Changed=1;
         if get(hObject,'Value')==1
             set(Xparam,'Enable','off');
@@ -247,93 +252,85 @@ function ui_FigPropPanel(efdb, propPanel, panelSize)
             end
             mArgsIn.Display.XAuto=0;
         end
-        guidata(mArgsIn.Handles.fh, mArgsIn);
+        guidata(hMainFig, mArgsIn);
         mArgsIn.Handles.DrawFcn(mArgsIn);
 %         figure(gcbf);
     end
     
-%     function XparamCallback(hObject,eventdata,hMainFig)
-%         mArgsIn=guidata(hMainFig);
-%         mArgsIn.Display.Changed=1;
-%         Args=guidata(mArgsIn.Handles.graphprop);
-%         for i=1:3
-%             if ~isnan(str2double(get(Args.Xparam(i),'String')))
-%                 mArgsIn.Display.graph_Xaxis_param(i)=str2double(get(Args.Xparam(i),'String'));
-%             end
-%         end
-%         guidata(hMainFig,mArgsIn);
-%         mArgsIn.Handles.DrawFcn(mArgsIn);
+    function XparamCallback(hObject,eventdata)
+        mArgsIn = guidata(hObject);
+        hMainFig = mArgsIn.Handles.fh;
+        
+        mArgsIn.Display.Changed=1;
+
+        for i=1:3
+            if ~isnan(str2double(get(Xparam(i),'String')))
+                mArgsIn.Display.graph_Xaxis_param(i)=str2double(get(Xparam(i),'String'));
+            end
+        end
+        guidata(hMainFig,mArgsIn);
+        mArgsIn.Handles.DrawFcn(mArgsIn);
 %         figure(gcbf);
-%     end
-%     function XAutoCallback(hObject,eventdata)
-%         mArgsIn=guidata(hMainFig);
-%         mArgsIn.Display.Changed=1;
-%         if get(hObject,'Value')==1
-%             set(get(get(hObject,'Parent'),'Children'),'Enable','off');
-%             set(hObject,'Enable','on');
-%             mArgsIn.Display.graph_Xaxis_param=get(get(Xaxis,'SelectedObject'),'UserData');
-%             mArgsIn.Display.XAuto=1;
-%         else
-%             set(get(get(hObject,'Parent'),'Children'),'Enable','on');
-%             for i=1:3
-%                 if ~isnan(str2double(get(Args.Xparam(i),'String')))
-%                     mArgsIn.Display.graph_Xaxis_param(i)=str2double(get(Args.Xparam(i),'String'));
-%                 end
-%             end
-%             mArgsIn.Display.XAuto=0;
-%         end
-%         guidata(hMainFig,mArgsIn);
-%         mArgsIn.Handles.DrawFcn(mArgsIn);
+    end
+
+
+    function YprmhistCallback(hObject,eventdata)
+        mArgsIn = guidata(hObject);
+        mArgsIn.Display.Changed=1;
+        mArgsIn.Display.histnormalize=get(get(hObject,'SelectedObject'),'Tag');
+        guidata(hMainFig,mArgsIn);
+        mArgsIn.Handles.DrawFcn(mArgsIn);
 %         figure(gcbf);
-%     end
-%     function YprmhistCallback(hObject,eventdata)
-%         mArgsIn=guidata(hMainFig);
-%         mArgsIn.Display.Changed=1;
-%         mArgsIn.Display.histnormalize=get(get(hObject,'SelectedObject'),'Tag');
-%         guidata(hMainFig,mArgsIn);
-%         mArgsIn.Handles.DrawFcn(mArgsIn);
+    end
+
+    function YparamCallback(hObject,eventdata)
+        mArgsIn = guidata(hObject);
+        hMainFig = mArgsIn.Handles.fh;
+        
+        mArgsIn.Display.Changed=1;
+        for i=1:3
+            if ~isnan(str2double(get(Yparam(i),'String')))
+                mArgsIn.Display.graph_Yaxis_param(i)=str2double(get(Yparam(i),'String'));
+            end
+        end
+        guidata(hMainFig,mArgsIn);
+        mArgsIn.Handles.DrawFcn(mArgsIn);
 %         figure(gcbf);
-%     end
-%     function YparamCallback(hObject,eventdata,hMainFig)
-%         mArgsIn=guidata(hMainFig);
-%         mArgsIn.Display.Changed=1;
-%         Args=guidata(mArgsIn.Handles.graphprop);
-%         for i=1:3
-%             if ~isnan(str2double(get(Args.Yparam(i),'String')))
-%                 mArgsIn.Display.graph_Yaxis_param(i)=str2double(get(Args.Yparam(i),'String'));
-%             end
-%         end
-%         guidata(hMainFig,mArgsIn);
-%         mArgsIn.Handles.DrawFcn(mArgsIn);
+    end
+
+    function YAutoCallback(hObject,eventdata)
+        mArgsIn = guidata(hObject);
+        hMainFig = mArgsIn.Handles.fh;
+        
+        mArgsIn.Display.Changed=1;
+        if get(hObject,'Value')==1
+            set(Yparam,'Enable','off');
+            set(hObject,'Enable','on');
+            mArgsIn.Display.graph_Yaxis_param=get(get(Yaxis,'SelectedObject'),'UserData');
+            mArgsIn.Display.YAuto=1;
+        else
+            %            set(hObject,'Value',1);
+            set(Yparam,'Enable','on');
+            for i=1:3
+                if ~isnan(str2double(get(Yparam(i),'String')))
+                    mArgsIn.Display.graph_Yaxis_param(i)=str2double(get(Yparam(i),'String'));
+                end
+            end
+            mArgsIn.Display.YAuto=0;
+        end
+        guidata(hMainFig,mArgsIn);
+        mArgsIn.Handles.DrawFcn(mArgsIn);
 %         figure(gcbf);
-%     end
-%     function YAutoCallback(hObject,eventdata)
-%         mArgsIn=guidata(hMainFig);
-%         mArgsIn.Display.Changed=1;
-%         if get(hObject,'Value')==1
-%             set(get(get(hObject,'Parent'),'Children'),'Enable','off');
-%             set(hObject,'Enable','on');
-%             mArgsIn.Display.graph_Yaxis_param=get(get(Yaxis,'SelectedObject'),'UserData');
-%             mArgsIn.Display.YAuto=1;
-%         else
-%             %            set(hObject,'Value',1);
-%             set(get(get(hObject,'Parent'),'Children'),'Enable','on');
-%             for i=1:3
-%                 if ~isnan(str2double(get(Args.Yparam(i),'String')))
-%                     mArgsIn.Display.graph_Yaxis_param(i)=str2double(get(Args.Yparam(i),'String'));
-%                 end
-%             end
-%             mArgsIn.Display.YAuto=0;
-%         end
-%         guidata(hMainFig,mArgsIn);
-%         mArgsIn.Handles.DrawFcn(mArgsIn);
-%         figure(gcbf);
-%     end
-%     function SmoothCallback(hObject,eventdata)
-%         mArgsIn=guidata(hMainFig);
-%         mArgsIn.Display.smoothprm=str2double(get(hObject,'string'));
-%         mArgsIn.Display.Changed=1;
-%         guidata(hMainFig,mArgsIn);
-%         mArgsIn.Handles.DrawFcn(mArgsIn);
-%     end
+    end
+
+
+    function SmoothCallback(hObject,eventdata)
+        mArgsIn = guidata(hObject);
+        hMainFig = mArgsIn.Handles.fh;
+        
+        mArgsIn.Display.smoothprm=str2double(get(hObject,'string'));
+        mArgsIn.Display.Changed=1;
+        guidata(hMainFig,mArgsIn);
+        mArgsIn.Handles.DrawFcn(mArgsIn);
+    end
 end

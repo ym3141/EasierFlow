@@ -276,6 +276,9 @@ function ui_FigPropPanel(efdb, propPanel, panelSize)
 
     function YprmhistCallback(hObject,eventdata)
         mArgsIn = guidata(hObject);
+        hMainFig = mArgsIn.Handles.fh;
+        
+        mArgsIn = guidata(hObject);
         mArgsIn.Display.Changed=1;
         mArgsIn.Display.histnormalize=get(get(hObject,'SelectedObject'),'Tag');
         guidata(hMainFig,mArgsIn);

@@ -309,7 +309,7 @@ function ui_FigPropPanel(efdb, propPanel, panelSize)
         if get(hObject,'Value')==1
             set(Yparam,'Enable','off');
             set(hObject,'Enable','on');
-            mArgsIn.Display.graph_Yaxis_param=get(get(Yaxis,'SelectedObject'),'UserData');
+            mArgsIn.Display.graph_Yaxis_param=get(get(YaxisBG,'SelectedObject'),'UserData');
             mArgsIn.Display.YAuto=1;
         else
             %            set(hObject,'Value',1);

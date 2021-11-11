@@ -113,10 +113,9 @@ function db=init_efdb(localConfig)
     db.Display.graph_Yaxis_param=1;
     db.Display.graph_Yaxis_Radio=4;
     db.Display.smoothprm=100;
-
-    db.DBInfo.Path=localConfig.fcsFileDir;
-    db.DBInfo.geom.Graphsize=150;
-    db.DBInfo.geom.Gatesize=120;
+    
+    db.DBInfo.localConfig = localConfig;
+    db.DBInfo.Path = localConfig.fcsFileDir;
 
     db.Statistics.ShowInStatView=[true(1,5),false(1,4)];
 end

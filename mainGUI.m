@@ -1,8 +1,9 @@
-function easyflow(localConfig)
+function mainGUI(efdb)
 %% Opens up a new empty easyflow session.
 % Note from Yitong Ma:
 % The easyflow software was originally write by Yaron Anteb, and the
-% orginal version was all written in a single file (this easyflow.m). I
+% orginal version was all written in a single file (this mainGUI.m, called 
+% easyflow.m previousely). I
 % have tried to split up this file and put codes into indevidual files in
 % the form of functions. What should remain here are the construction of
 % the main GUI, and their callbacks. That said, there are still lots of
@@ -19,11 +20,8 @@ uipos_rightPanelWidth = 200;
 uipos_figpropPanelHeight = 420;
 
 % Get the current version number
-curversion = easierFlowInfo('version');
-
-% Initialize
-efdb = init_efdb(localConfig);
-
+curversion = efdb.version;
+localConfig = efdb.DBInfo.localConfig;
 
 Handles=[];
         
@@ -36,8 +34,6 @@ Handles.fh=figure('Position',[scrsz(3)*.15,(scrsz(4)-720)/2, 1080, 720],...
     'Visible','off',...
     'ResizeFcn',{@fhResizeFcn},...
     'KeyPressFcn',{@fhKeyPressFcn},...
-    'WindowButtonDownFcn',@ResizeFcn,...
-    'WindowButtonMotionFcn',@fhMotionFcn,...
     'CloseRequestFcn',@fhClose);
 
 %%  Construct the UI regions
@@ -355,37 +351,6 @@ set(fh,'Visible','on');
 % disable gui       efdb=disable_gui(efdb);
 % enable gui        efdb=enable_gui(efdb);
 %
-    function ResizeFcn(hObject,~)
-        WBDF = get(gcf,'WindowButtonDownFcn');
-        WBUF = get(gcf,'WindowButtonUpFcn');
-        WBMF = get(gcf,'WindowButtonMotionFcn');
-        pntr = get(gcf,'Pointer');
-        
-        efdb=efdb_load(hObject);
-        p=get(hObject,'CurrentPoint');
-        if p(1)>efdb.DBInfo.geom.Graphsize && p(1)<=efdb.DBInfo.geom.Graphsize+5
-            %resize the graph list
-            hObject.WindowButtonMotionFcn=@ResizeWBMF;
-            hObject.WindowButtonUpFcn=@ResizeWBUP;
-        else
-            %do nothing
-        end
-
-        function ResizeWBUP(hObject,~)
-            set(gcf,'WindowButtonDownFcn', WBDF);
-            set(gcf,'WindowButtonUpFcn', WBUF);
-            set(gcf,'WindowButtonMotionFcn', WBMF);
-            set(gcf,'Pointer', pntr);
-        end
-        function ResizeWBMF(hObject,~)
-            efdb=efdb_load(hObject);
-            mp=get(hObject,'CurrentPoint');
-            efdb.DBInfo.geom.Graphsize=mp(1);
-            efdb_save(efdb);
-            fhResizeFcn(hObject,[]);
-        end
- 
-    end
 
     function fhResizeFcn(hObject,~)
         
@@ -415,6 +380,7 @@ set(fh,'Visible','on');
         %redraw the gates in the gate list
         UpdateGateList(efdb);
     end
+
     function fhClose(hObject,eventdata)
         efdb=efdb_load(hObject);
         if isfield(efdb,'DBInfo') && isfield(efdb.DBInfo,'isChanged') && efdb.DBInfo.isChanged==1
@@ -481,18 +447,6 @@ set(fh,'Visible','on');
             end
         end
         efdb_save(efdb);
-    end
-    function fhMotionFcn(hObject,~)
-        efdb=efdb_load(hObject);
-        fhIn=efdb.Handles.fh;
-        p=get(fhIn,'CurrentPoint');
-        if strcmp(efdb.Handles.GraphList.Enable,'on')
-            if p(1)>efdb.DBInfo.geom.Graphsize && p(1)<=efdb.DBInfo.geom.Graphsize+5
-                set(fhIn,'Pointer','right')
-            else
-                set(fhIn,'Pointer','arrow')
-            end
-        end
     end
 
     function TubePUMCallback(hObject,eventdata)

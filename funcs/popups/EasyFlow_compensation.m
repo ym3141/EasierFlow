@@ -329,3 +329,52 @@ function [compmat,colorlist]=EFCalcComp
     colorlist=parname(usedcolors);
     compmat=fcscompensate(singledata);
 end
+
+function [M,AF]=fcscompensate(I)
+    %fcscompensate(I) returns the compensation matrix, given cell array of matrices each with a
+    %single color data.
+    %number of elements in I is the same as size(,2) of each of the elements.
+    %the n'th element of I is stained with the nth color, measured in the nth
+    %nth row of each of the elements of I.
+    %
+    %better results are when the staining as least homogeneous.
+    %
+    %minimize the standard deviation of the overflown data
+    %but ignore very off points (more than one std away)
+    %
+    %if R are the real values for the n colors, and O are the observed ones
+    %then we have
+    %   O=M*R+AF
+    % such that M is the spillover matrix and AF is the autoflouresence and
+    %   R=inv(M)*(O-AF)
+
+    color_num=length(I);
+    M=zeros(color_num);
+    AFmat=zeros(color_num);
+
+    for stain_color=1:color_num
+        for ow_color=1:color_num
+            data=I{stain_color};
+            %        M(ow_color,stain_color)=fminsearch(@(x) stdstd(x,data(:,ow_color),data(:,stain_color)),0);
+            M(ow_color,stain_color)=fminbnd(@(x) mad(data(:,ow_color)-x*data(:,stain_color),1),0,2);
+            AFmat(ow_color,stain_color)=median(data(:,ow_color)-M(ow_color,stain_color)*data(:,stain_color));
+        end
+    end
+
+    AF=inv(diag(color_num*ones(1,color_num))-M)*sum(AFmat,2);
+
+
+
+    function s=stdstd(m,ow,stain)
+        A=ow-m*stain;
+        s=std(A(abs(A-mean(A))<std(A)));
+        i=1;stat=struct;
+        for tube=fieldnames(mArgsIn.data)'
+            f=fit([1:length(mArgsIn.data.(char(tube)))]',mArgsIn.data.(char(tube))(:,end)/100,'poly1');
+            stat(i).name=char(tube);
+            stat(i).cpl=1/f.p1;%cells per lambda, actually per second
+            stat(i).mcpl=length(mArgsIn.data.(char(tube)))/mArgsIn.data.(char(tube))(end,end)*100;%mean cells per lambda
+            i=i+1;
+        end
+    end
+end

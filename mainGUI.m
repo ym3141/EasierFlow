@@ -867,8 +867,9 @@ set(fh,'Visible','on');
     end
 
     function SessionNewCallback(varargin)
-        easyflow(localConfig);
+        run('./mainEasierFlow.m');
     end
+
     function SessionLoadCallback(hObject,eventdata,filename)
         fhIn=ancestor(hObject,'figure');
         efdbIn=guidata(fhIn);

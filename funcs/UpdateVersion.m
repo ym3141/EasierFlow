@@ -199,6 +199,12 @@ function mArgsIn=UpdateVersion(mArgsIn, curversion)
         end
         mArgsIn.GatesDBnew=allgates;
     end
+    if mArgsIn.version<3.23
+        mFile = load('./asset/PlotColors.mat');
+        mArgsIn.Display.GraphColor = mFile.ColorMat;
+        mArgsIn.Display.XAuto = true;
+        mArgsIn.Display.YAuto = true;
+    end
     %insert before this line the text in FileLoadCallback after the comment:
 
     mArgsIn.version=curversion;

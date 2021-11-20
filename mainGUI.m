@@ -731,7 +731,7 @@ function mainGUI(efdb)
             %read the display settings from the first graph, and update the
             %figure prop window.
             if isfield(efdb.GraphDB(efdb.curGraph(1)),'Display') && ~isempty(efdb.GraphDB(efdb.curGraph(1)).Display)
-                efdb.Display=efdb.GraphDB(efdb.curGraph(1)).Display;
+%                 efdb.Display=efdb.GraphDB(efdb.curGraph(1)).Display;
                 if isfield(efdb.Display,'Axis')
                     set(findobj(fhIn,'Label','Fix Axis'), 'Checked', 'on');
                 else
@@ -871,29 +871,17 @@ function mainGUI(efdb)
         run('./mainEasierFlow.m');
     end
 
-    function SessionLoadCallback(hObject,eventdata,filename)
+    function SessionLoadCallback(hObject,eventdata)
         fhIn=ancestor(hObject,'figure');
         efdbIn=guidata(fhIn);
         set(fhIn,'pointer','watch');
-        if exist('filename','var') %Load input session file
-            [dname,fname,fext]=fileparts(filename);
-            if isempty(dname)
-                %only filename with no directory
-                dname=localConfig.fcsFileDir;
-            end
-            if isempty(fext)
-                %defult efl extension
-                fext='.efl';
-            end
-            dirname=[dname filesep];
-            filename=[fname,fext];
-        else %Browse for file to open
-            if isfield(efdbIn,'DBInfo') && isfield(efdbIn.DBInfo,'Path') && ischar(efdbIn.DBInfo.Path) && exist(efdbIn.DBInfo.Path,'dir')
-                [filename,dirname]=uigetfile('*.efl','Open Analysis',efdbIn.DBInfo.Path);
-            else
-                [filename,dirname]=uigetfile('*.efl','Open Analysis',localConfig.fcsFileDir);
-            end
+
+        if isfield(efdbIn,'DBInfo') && isfield(efdbIn.DBInfo,'Path') && ischar(efdbIn.DBInfo.Path) && exist(efdbIn.DBInfo.Path,'dir')
+            [filename,dirname]=uigetfile('*.efl','Open Analysis',efdbIn.DBInfo.Path);
+        else
+            [filename,dirname]=uigetfile('*.efl','Open Analysis',localConfig.fcsFileDir);
         end
+%         end
         if ~ischar(filename) || ~exist([dirname,filename],'file')
             set(fhIn,'pointer','arrow');
             return

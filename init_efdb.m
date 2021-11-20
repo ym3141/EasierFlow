@@ -68,7 +68,7 @@ function db=init_efdb(localConfig)
     %
     %
     
-    curversion = easierFlowInfo('version');
+    curversion = 3.23;
     
     db=struct(...
         'version',curversion,...
@@ -96,14 +96,10 @@ function db=init_efdb(localConfig)
         'CompensationMtx',{},...
         'CompensationIndex',{},...
         'compdata',{});
-
-    db.Display.GraphColor=[0,   0,   1;
-        0,   0.5, 0;
-        1,   0,   0;
-        0,   0.75,0.75;
-        0.75,0,   0.75;
-        0.75,0.75,0;
-        0.25,0.25,0.25];
+    
+    mFile = load('./asset/PlotColors.mat');
+    db.Display.GraphColor=mFile.ColorMat;
+    
     db.Display.graph_type='Histogram';
     db.Display.graph_type_Radio=5;
     db.Display.graph_Xaxis='log';
@@ -112,6 +108,8 @@ function db=init_efdb(localConfig)
     db.Display.graph_Yaxis='ylin';
     db.Display.graph_Yaxis_param=1;
     db.Display.graph_Yaxis_Radio=4;
+    db.Display.XAuto = true;
+    db.Display.YAuto = true;
     db.Display.smoothprm=100;
     
     db.DBInfo.localConfig = localConfig;

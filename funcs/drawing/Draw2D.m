@@ -1,6 +1,10 @@
 function efdb = Draw2D(efdb)
         %Draw 2d contours
     no_data_graphs=[];
+    
+    paletteLen = length(efdb.Display.GraphColor);
+
+    
     if isscalar(efdb.curGraph) || strcmp(efdb.Display.graph_type,'Dot Plot')
         for graph=efdb.curGraph
             tubeidx=find(strcmp([efdb.TubeDB.Tubename],efdb.GraphDB(graph).Data),1,'first');
@@ -26,7 +30,7 @@ function efdb = Draw2D(efdb)
             graphs=get(gca,'Children');
             if strcmp(get(get(gca,'children'),'type'),'line')
                 if ~isfield(efdb.GraphDB(graph),'PlotColor') || length(efdb.GraphDB(graph).PlotColor)~=3
-                    efdb.GraphDB(graph).PlotColor=efdb.Display.GraphColor(mod(graph,7)+(mod(graph,7)==0)*7,:);
+                    efdb.GraphDB(graph).PlotColor=efdb.Display.GraphColor(mod(graph,paletteLen)+(mod(graph,paletteLen)==0)*paletteLen,:);
                 end
                 set(graphs(1),'Color',efdb.GraphDB(graph).PlotColor);
             end

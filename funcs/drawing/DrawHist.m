@@ -7,6 +7,9 @@ function efdb = DrawHist(efdb)
     allgraphs=get(efdb.Handles.GraphList,'Value');
     lgnd=cell(1,length(allgraphs));
     lgnd_len = 0;
+    
+    paletteLen = length(efdb.Display.GraphColor);
+    
     for i=1:length(allgraphs)
         graph=allgraphs(i);
         if isfield(efdb.TubeDB,'Tubename')
@@ -69,7 +72,7 @@ function efdb = DrawHist(efdb)
         efdb.GraphDB(graph).plotdata=[bins(:),hist(:)];
         graphs=get(gca,'Children');
         if ~isfield(efdb.GraphDB(graph),'PlotColor') || length(efdb.GraphDB(graph).PlotColor)~=3
-            efdb.GraphDB(graph).PlotColor=efdb.Display.GraphColor(mod(graph,7)+(mod(graph,7)==0)*7,:);
+            efdb.GraphDB(graph).PlotColor=efdb.Display.GraphColor(mod(graph,paletteLen)+(mod(graph,paletteLen)==0)*paletteLen,:);
         end
         set(graphs(1),'Color',efdb.GraphDB(graph).PlotColor);
         %if a fit exists, draw the fit

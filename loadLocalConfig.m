@@ -3,14 +3,15 @@ function config=loadLocalConfig()
 % if json file exist load it, if not prompt a window for the user to
 % initialize the program (create the ./localConfig.json)
 %%   
-    if isfile('./localConfig.json')
-        jsontxt = fileread('./localConfig.json');
+    if isfile('./localConfig_User.json')
+        jsontxt = fileread('./localConfig_User.json');
         config = jsondecode(jsontxt);
         
     else
         disp('There seems no local config to load, prompting initialization window...');
         
         config = struct;
+        fileWriteable = true; 
         
         scrsz=get(0,'ScreenSize');
         d = dialog('Position', [scrsz(3)/2, scrsz(4)/2, 350, 130], 'Name', 'Welcome to EasierFlow');
@@ -23,41 +24,63 @@ function config=loadLocalConfig()
 
         DirDisp = uicontrol('Parent', d,...
                'Style','edit', 'enable', 'off',...
-               'Position', [20, 60, 300, 20], ...
+               'Position', [20, 70, 300, 20], ...
                'HorizontalAlignment', 'left', ...
                'String', './Root_directory_of_your_fcs_files (default = current directory)', ...
                'Callback', @edit_callback);
 
         btnBr = uicontrol('Parent', d,...
-               'Position',[20 20 70 25],...
+               'Position',[20 35 70 25],...
                'String','Browse',...
                'Callback', @browse_callback);
         
         btnOK = uicontrol('Parent', d,...
-               'Position',[110 20 70 25],...
+               'Position',[110 35 70 25],...
                'String', 'OK',...
                'Enable', 'off',...
                'Callback', @OK_callback);
            
         btnSk = uicontrol('Parent', d,...
-               'Position',[200 20 70 25],...
+               'Position',[200 35 70 25],...
                'String','Skip',...
                'Callback', 'delete(gcf)');
+           
+        warning = uicontrol('Parent', d,...
+               'Style', 'text','Max', 2, 'Visible', 0,...
+               'Position', [20, 5, 330, 25],...
+               'HorizontalAlignment', 'left', ...
+               'ForegroundColor', 'r',...
+               'String', ["Accessed denied:", "Try restart Easierflow as admin, or Skip to use default config"]);
 
+        fid = fopen('./localConfig_User.json', 'w');
+        if fid == -1
+            fileWriteable = false;
+            warning.Visible = 1;
+            btnOK.Enable = 'off';
+            btnBr.Enable = 'off';
+            
+            jsontxt = fileread('./localConfig_Default.json');
+            config = jsondecode(jsontxt);
+        else
+            fclose(fid);
+        end
+        
         % Wait for d to close before running to completion
         uiwait(d);        
         
-        config.configVer = easierFlowInfo('version');
-        if ~isfield(config, 'fcsFileDir')
-            config.fcsFileDir = './';
+        if fileWriteable
+            config.configVer = easierFlowInfo('version');
+            if ~isfield(config, 'fcsFileDir')
+                config.fcsFileDir = './';
+            end
+
+            config.fcsFileDir = strrep(config.fcsFileDir, '\', '/');
+
+            jsonText = jsonencode(config);
+            fid = fopen('./localConfig_User.json', 'w');
+            fprintf(fid, jsonText); 
+            fclose(fid);
         end
-        
-        config.fcsFileDir = strrep(config.fcsFileDir, '\', '/');
-        
-        jsonText = jsonencode(config);
-        fid = fopen('./localConfig.json', 'w');
-        fprintf(fid, jsonText); 
-        fclose(fid);
     end
     
     function edit_callback(hObject, eventdata)

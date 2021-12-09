@@ -6,7 +6,9 @@ function mArgsIn = DrawToFigure(mArgsIn)
     %mArgsIn.Display.graph_Yaxis can be 'ylin' or 'ylog'
     %set up the axis for plotting
     hFig=figure;
-    plottools(hFig);
+    if ~isdeployed
+        plottools(hFig);
+    end
     cla(gca);
     hold on;
     switch mArgsIn.Display.graph_type

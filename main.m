@@ -10,7 +10,7 @@ end
 localConfig = loadLocalConfig();
 efdb = init_efdb(localConfig);
 
-mainGUI(efdb);
+efGUI(efdb);
 
 % Returns the folder where the compiled executable actually resides.
 function [executableFolder] = GetExecutableFolder() 

@@ -1,8 +1,8 @@
-function mainGUI(efdb)
+function efGUI(efdb)
     %% Opens up a new empty easyflow session.
     % Note from Yitong Ma: The easyflow software was originally write by
     % Yaron Anteb, and the orginal version was all written in a single file
-    % (this mainGUI.m, called easyflow.m previousely). I have tried to
+    % (this efGUI.m, called easyflow.m previousely). I have tried to
     % split up this file and put codes into indevidual files in the form of
     % functions. What should remain here are the construction of the main
     % GUI, and their callbacks. That said, there are still lots of other

@@ -105,10 +105,10 @@ switch length(yprm)
         yprm=[];
 end
 %make the minvalue and maxvalue within the range of samples
-xmax=min(xmax,max(xdat));
-xmin=max(xmin,min(xdat));
-ymax=min(ymax,max(ydat));
-ymin=max(ymin,min(ydat));
+xmax=xscalefun(xmax, xprm);
+xmin=xscalefun(xmin, xprm);
+ymax=yscalefun(ymax, yprm);
+ymin=yscalefun(ymin, yprm);
 
 %take the data in the wanted range only and rescale it
 xdat=xscalefun(xdat,xprm);
@@ -141,9 +141,12 @@ switch option
         contour(Xm,Ym,mhist,10);
         hold off
 end
+
+axis auto;
+
 %set labeling of the axes
-xtickfun(xmin,xmax,xprm,'X');
-ytickfun(ymin,ymax,yprm,'Y');
+% xtickfun(xmin,xmax,xprm,'X');
+% ytickfun(ymin,ymax,yprm,'Y');
 
 
 %these function are the scaling functions.

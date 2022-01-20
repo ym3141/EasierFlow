@@ -71,11 +71,11 @@ function efdb = Draw2D(efdb)
             1,2,...
             efdb.Display.graph_type,efdb.Display.graph_Xaxis,efdb.Display.graph_Xaxis_param,efdb.Display.graph_Yaxis,efdb.Display.graph_Yaxis_param);
     end
-    if isfield(efdb.Display,'Axis')
-        axis(efdb.Display.Axis);
-    else
-        axis tight;
-    end
+%     if isfield(efdb.Display,'Axis')
+%         axis(efdb.Display.Axis);
+%     else
+%         axis tight;
+%     end
     if ~isempty(no_data_graphs)
         msgbox(['The graphs ''' no_data_graphs ''' contain no data.'],'EasyFlow','error','modal');
         uiwait;

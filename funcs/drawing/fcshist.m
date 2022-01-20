@@ -161,13 +161,14 @@ function [hout,binsout]=fcshist(varargin)
     end
     function logtick(minvalue,maxvalue,prm,dim)
         %only strat at 1
-        ticksnum=floor(logscale(minvalue,prm)):ceil(logscale(maxvalue,prm));
-        nticks=range(ticksnum)+1;
-        ticksl=cell(9,nticks);
-        ticksl(1,:)=arrayfun(@(x) sprintf('10^{%d}',x),ticksnum,'unif',0);
-        ticks=bsxfun(@times,(1:9)',10.^ticksnum);
-        set(gca,[dim 'Tick'],logscale(ticks,prm))
-        set(gca,[dim 'TickLabel'],ticksl)
+%         ticksnum=floor(logscale(minvalue,prm)):ceil(logscale(maxvalue,prm));
+%         nticks=range(ticksnum)+1;
+%         ticksl=cell(9,nticks);
+%         ticksl(1,:)=arrayfun(@(x) sprintf('10^{%d}',x),ticksnum,'unif',0);
+%         ticks=bsxfun(@times,(1:9)',10.^ticksnum);
+%         set(gca,[dim 'Tick'],logscale(ticks,prm))
+%         set(gca,[dim 'TickLabel'],ticksl)
+        axis auto
     end
     function logicletick(minvalue,maxvalue,prm,dim)
         if maxvalue>0

@@ -370,8 +370,6 @@ function efGUI(efdb)
             set(efdb.Handles.FigPropPanel,'Position',[guipos(3)-uipos_rightPanelWidth, 0, uipos_rightPanelWidth, uipos_figpropPanelHeight]);
 
             set(efdb.Handles.ax,'OuterPosition',[uipos_graphPanelWidth, 0, guipos(3)-uipos_rightPanelWidth-uipos_graphPanelWidth, guipos(4)-uipos_topPanelHeight]);
-
-            efdb_save(efdb);
             
         catch resizeError
             if ~(strcmp(resizeError.identifier,'MATLAB:hg:set_chck:DimensionsOutsideRange'))
@@ -794,6 +792,7 @@ function efGUI(efdb)
         if isempty(efdbIn.GraphDB)
             set(filemenu,'Enable','off');
             set(findobj(hObject,'Label','Open Session...'),'Enable','on');
+            set(findobj(hObject,'Label', 'New Session'),'Enable','on');
         end
         MenuFileRelpath=findobj(hObject,'Label','Use Relative Path');
         if isfield(efdbIn.DBInfo,'RootFolder')
@@ -801,11 +800,11 @@ function efGUI(efdb)
         else
             MenuFileRelpath.Checked='off';
         end        
-        if isequal(rmfield(efdbIn,'Handles'),rmfield(init_efdb(localConfig),'Handles'))
-            set(findobj(hObject,'Label', 'New Session'),'Enable','off')
-        else
-            set(findobj(hObject,'Label', 'New Session'),'Enable','on')
-        end
+%         if isequal(rmfield(efdbIn,'Handles'),rmfield(init_efdb(localConfig),'Handles'))
+%             set(findobj(hObject,'Label', 'New Session'),'Enable','off')
+%         else
+%             set(findobj(hObject,'Label', 'New Session'),'Enable','on')
+%         end
     end
     function mDataCallback(hObject,varargin)
         fhIn=ancestor(hObject,'figure');
@@ -869,7 +868,7 @@ function efGUI(efdb)
     end
 
     function SessionNewCallback(varargin)
-        run('./mainEasierFlow.m');
+        run('./main.m');
     end
 
     function SessionLoadCallback(hObject,eventdata)

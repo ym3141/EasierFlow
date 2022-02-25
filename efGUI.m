@@ -1124,6 +1124,36 @@ function efGUI(efdb)
             set(fh,'pointer','arrow');
             return
         end
+        
+        % Sort the file names if all of them are CytoFlex
+        nameArray = strings([length(filename), 4]);
+        allCytoFlex = true;
+        for idx = 1:numel(filename)
+            tubeName = filename{idx};
+            match = regexp(tubeName, '\d\d-Tube-[A-H]\d+.fcs', 'match');
+            if isempty(match) || length(match) > 1
+                allCytoFlex = false;
+                break;
+            end
+            nameArray(idx, 1) = tubeName(1:2);
+            nameArray(idx, 2) = tubeName(9);
+            if length(tubeName) == 14
+                nameArray(idx, 3) = ['0', tubeName(10)];
+            elseif length(tubeName) == 15
+                nameArray(idx, 3) = tubeName(10:11);
+            else
+                allCytoFlex = false;
+                break;
+            end
+            
+            nameArray(idx, 4) = tubeName;
+        end
+        
+        if allCytoFlex
+            nameArray_sorted = sortrows(nameArray, [1, 2, 3]);
+            filename = nameArray_sorted(:, 4)';
+        end
+        
         tic; ntot=length(filename); loopnum=0;
         h=waitbar(0,'Loading Tubes...','WindowStyle','modal');
         for curfile=filename
@@ -1138,6 +1168,8 @@ function efGUI(efdb)
             % the TUBE NAME is the field by which the tube is named, if not
             % use filname and make a tubename field
             ctube=LoadTube(fcsfile);
+            tempName = ctube.Tubename{1};
+            ctube.Tubename{1} = tempName(1:end-4);
             if ~isempty(mArgsIn.TubeDB)
                 %automatically make tubename unique
                 tubename=matlab.lang.makeUniqueStrings(ctube.Tubename{1},[mArgsIn.TubeDB.Tubename]);
@@ -1198,12 +1230,15 @@ function efGUI(efdb)
             % the TUBE NAME is the field by which the tube is named, if not
             % use filname and make a tubename field
             ctube=LoadTube(fcsfile);
+            tempName = ctube.Tubename{1};
+            ctube.Tubename{1} = tempName(1:end-4);
+            
             if ~isempty(mArgsIn.TubeDB)
                 %automatically make tubename unique
                 tubename=matlab.lang.makeUniqueStrings(ctube.Tubename{1},[mArgsIn.TubeDB.Tubename]);
                 ctube.fcsfile=fcssetparam(ctube.fcsfile,'TUBE NAME',tubename);
                 ctube.Tubename{1}=tubename;
-
+                
 
                 if isempty(ctube.Tubename{1})
                     continue
